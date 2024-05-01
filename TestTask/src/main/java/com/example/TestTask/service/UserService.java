@@ -30,29 +30,33 @@ public class UserService {
     }
 
     public UserEntity getUser(Long id) throws UserNotFoundException {
-        UserEntity user = userRepo.findById(id).get();
-        if(user==null){
+        try {
+            UserEntity user = userRepo.findById(id).get();
+            return user;
+        }catch (Exception e) {
             throw new UserNotFoundException("User not found");
         }
-        return user;
     }
-    public UserEntity updateFirstName(UserEntity user) throws UserNotFoundException, UserInvalidException{
+    public UserEntity updateFirstName(UserEntity user) throws UserNotFoundException, UserInvalidException {
         Long id = user.getId();
         validatorUpdateUser(user);
-        UserEntity userToUpdate = userRepo.findById(user.getId()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        UserEntity userToUpdate;
 
-        if (updateUserValid) {
-            userToUpdate.setFirstName(user.getFirstName());
-            return userRepo.save(userToUpdate);
-        } else {
-            return null;
+            if(updateUserValid) {
+                userToUpdate = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+                userToUpdate.setFirstName(user.getFirstName());
+                return userRepo.save(userToUpdate);
+            }else{
+                throw new UserInvalidException("invalid user");
+            }
         }
-    }
+
+
 
     public UserEntity updateFullName(UserEntity user) throws UserNotFoundException, UserInvalidException {
         Long id = user.getId();
         validatorUpdateUser(user);
-        UserEntity userToUpdate = userRepo.findById(user.getId()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        UserEntity userToUpdate = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (updateUserValid) {
             userToUpdate.setFirstName(user.getFirstName());
@@ -61,13 +65,13 @@ public class UserService {
 
             return userRepo.save(userToUpdate);
         } else {
-            return null;
+            throw new UserInvalidException("invalid user");
         }
     }
     public UserEntity updateAll(UserEntity user) throws UserNotFoundException, UserInvalidException {
         Long id = user.getId();
         validatorUpdateUser(user);
-        UserEntity userToUpdate = userRepo.findById(user.getId()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        UserEntity userToUpdate = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (updateUserValid) {
             userToUpdate.setFirstName(user.getFirstName());
@@ -81,7 +85,7 @@ public class UserService {
             userToUpdate.setAddress(user.getAddress());
             return userRepo.save(userToUpdate);
         } else {
-            return null;
+            throw new UserInvalidException("invalid user");
         }
     }
 
